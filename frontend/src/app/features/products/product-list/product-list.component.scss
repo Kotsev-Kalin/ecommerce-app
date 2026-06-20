@@ -1,0 +1,38 @@
+.page {
+  padding: 2rem 0;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.search input {
+  min-width: 260px;
+  padding: 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+}
+
+.search button {
+  padding: 0.8rem 1rem;
+  border: none;
+  background: #2563eb;
+  color: white;
+  border-radius: 10px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem;
+}

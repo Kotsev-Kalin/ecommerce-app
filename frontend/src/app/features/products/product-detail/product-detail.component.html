@@ -1,0 +1,17 @@
+<section class="container" *ngIf="product as item" style="padding: 2rem 0;">
+  <div class="card" style="padding: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    <div>
+      <img [src]="item.imageUrl || 'https://via.placeholder.com/640x420?text=Product'" [alt]="item.name" style="width: 100%; border-radius: 14px;">
+    </div>
+    <div>
+      <p style="color: #2563eb; font-weight: 700;">{{ item.categoryName || 'Uncategorized' }}</p>
+      <h1 class="page-title">{{ item.name }}</h1>
+      <p>{{ item.description }}</p>
+      <h2 style="margin-top: 1.25rem;">{{ item.price | currency }}</h2>
+      <p>Stock: {{ item.stockQuantity }}</p>
+      <button type="button" (click)="addToCart()" style="margin-top: 1rem; padding: 0.9rem 1.2rem; border: none; border-radius: 10px; background: #111827; color: white;">
+        Add to cart
+      </button>
+    </div>
+  </div>
+</section>
