@@ -1,0 +1,13 @@
+<section class="container" style="padding: 2rem 0;">
+  <div class="card" style="padding: 2rem; max-width: 480px; margin: 0 auto;">
+    <h1 class="page-title">Login</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label>Email</label>
+      <input formControlName="email" type="email" style="width: 100%; margin: 0.5rem 0 1rem; padding: 0.85rem; border-radius: 10px; border: 1px solid #d1d5db;">
+      <label>Password</label>
+      <input formControlName="password" type="password" style="width: 100%; margin: 0.5rem 0 1rem; padding: 0.85rem; border-radius: 10px; border: 1px solid #d1d5db;">
+      <p *ngIf="errorMessage" style="color: #dc2626;">{{ errorMessage }}</p>
+      <button type="submit" style="width: 100%; padding: 0.9rem; border: none; border-radius: 10px; background: #111827; color: white;">Sign in</button>
+    </form>
+  </div>
+</section>

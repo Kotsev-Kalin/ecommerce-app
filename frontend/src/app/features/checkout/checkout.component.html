@@ -1,0 +1,15 @@
+<section class="container" style="padding: 2rem 0;">
+  <div class="card" style="padding: 2rem; max-width: 720px; margin: 0 auto;">
+    <h1 class="page-title">Checkout</h1>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <label for="shippingAddress" style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Shipping address</label>
+      <textarea id="shippingAddress" rows="5" formControlName="shippingAddress" style="width: 100%; padding: 0.9rem; border-radius: 10px; border: 1px solid #d1d5db;"></textarea>
+      <p *ngIf="form.controls.shippingAddress.invalid && form.controls.shippingAddress.touched" style="color: #dc2626;">
+        Please enter a valid shipping address.
+      </p>
+      <button type="submit" [disabled]="submitting" style="margin-top: 1rem; padding: 0.9rem 1.2rem; border: none; border-radius: 10px; background: #2563eb; color: white;">
+        {{ submitting ? 'Placing order...' : 'Place order' }}
+      </button>
+    </form>
+  </div>
+</section>
