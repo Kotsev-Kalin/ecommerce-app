@@ -1,0 +1,52 @@
+.page {
+  padding: 2rem 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.items,
+.summary {
+  padding: 1.5rem;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 120px 1fr 110px 90px;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.item img {
+  width: 120px;
+  border-radius: 12px;
+}
+
+.item input {
+  padding: 0.7rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+}
+
+.item button,
+.summary button {
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #111827;
+  color: white;
+}
+
+.summary__total {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
