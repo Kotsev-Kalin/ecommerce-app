@@ -1,0 +1,56 @@
+.hero {
+  background: linear-gradient(135deg, #111827, #2563eb);
+  color: white;
+  padding: 5rem 0;
+}
+
+.hero__content {
+  display: flex;
+  align-items: center;
+  min-height: 320px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  max-width: 760px;
+  margin-bottom: 1rem;
+}
+
+.hero__actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.primary,
+.secondary {
+  padding: 0.9rem 1.2rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.primary {
+  background: #ffffff;
+  color: #111827;
+}
+
+.secondary {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.section {
+  padding: 3rem 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.2rem;
+}

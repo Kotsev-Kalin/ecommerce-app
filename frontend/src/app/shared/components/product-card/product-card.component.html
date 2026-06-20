@@ -1,0 +1,15 @@
+<article class="card product-card">
+  <img [src]="product.imageUrl || 'https://via.placeholder.com/320x220?text=Product'" [alt]="product.name">
+  <div class="product-card__body">
+    <p class="category">{{ product.categoryName || 'Uncategorized' }}</p>
+    <h3>{{ product.name }}</h3>
+    <p class="description">{{ product.description }}</p>
+    <div class="product-card__footer">
+      <strong>{{ product.price | currency }}</strong>
+      <div class="actions">
+        <a [routerLink]="['/products', product.id]">View</a>
+        <button type="button" (click)="addToCart()">Add</button>
+      </div>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,23 @@
+<nav class="navbar">
+  <div class="container navbar__content">
+    <a routerLink="/" class="brand">E-Commerce AI</a>
+
+    <div class="links">
+      <a routerLink="/products">Products</a>
+      <a routerLink="/cart" *ngIf="authService.isAuthenticated()">Cart ({{ cartCount$ | async }})</a>
+      <a routerLink="/profile" *ngIf="authService.isAuthenticated()">Profile</a>
+      <a routerLink="/admin" *ngIf="authService.isAdmin()">Admin</a>
+    </div>
+
+    <div class="actions">
+      <ng-container *ngIf="currentUser$ | async as user; else guest">
+        <span class="welcome">Hi, {{ user.fullName }}</span>
+        <button type="button" (click)="logout()">Logout</button>
+      </ng-container>
+      <ng-template #guest>
+        <a routerLink="/login">Login</a>
+        <a routerLink="/register" class="register">Register</a>
+      </ng-template>
+    </div>
+  </div>
+</nav>

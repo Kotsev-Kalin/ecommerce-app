@@ -1,0 +1,41 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #111827;
+  color: white;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+
+.navbar__content {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.links,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.register,
+.actions button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+}
+
+.welcome {
+  opacity: 0.85;
+}

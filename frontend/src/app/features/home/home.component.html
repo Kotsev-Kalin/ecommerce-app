@@ -1,0 +1,20 @@
+<section class="hero">
+  <div class="container hero__content">
+    <div>
+      <p class="eyebrow">AI-Assisted Commerce Demo</p>
+      <h1>Shop smarter with a modern Angular + Spring Boot storefront.</h1>
+      <p>Browse products, add them to a persistent cart, and complete checkout with JWT-secured APIs.</p>
+      <div class="hero__actions">
+        <a routerLink="/products" class="primary">Browse products</a>
+        <a routerLink="/register" class="secondary">Create account</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container section">
+  <h2>Featured products</h2>
+  <div class="grid">
+    <app-product-card *ngFor="let product of featuredProducts" [product]="product"></app-product-card>
+  </div>
+</section>
