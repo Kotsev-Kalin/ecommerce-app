@@ -1,0 +1,30 @@
+<section class="container" style="padding: 2rem 0;">
+  <h1 class="page-title">Admin Dashboard</h1>
+  <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+    <p><strong>Total orders:</strong> {{ orders.length }}</p>
+    <p><strong>Total revenue:</strong> {{ totalRevenue | currency }}</p>
+    <a routerLink="/admin/products" style="color: #2563eb; font-weight: 700;">Manage products</a>
+  </div>
+
+  <div class="card" style="padding: 1.5rem;">
+    <h2>Recent Orders</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="text-align: left; padding: 0.5rem;">Order</th>
+          <th style="text-align: left; padding: 0.5rem;">Status</th>
+          <th style="text-align: left; padding: 0.5rem;">Date</th>
+          <th style="text-align: left; padding: 0.5rem;">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders">
+          <td style="padding: 0.5rem;">#{{ order.id }}</td>
+          <td style="padding: 0.5rem;">{{ order.status }}</td>
+          <td style="padding: 0.5rem;">{{ order.createdAt | date:'short' }}</td>
+          <td style="padding: 0.5rem;">{{ order.totalAmount | currency }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
