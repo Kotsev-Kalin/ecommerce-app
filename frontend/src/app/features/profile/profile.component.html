@@ -1,0 +1,21 @@
+<section class="container page">
+  <div class="card profile-card">
+    <h1 class="page-title">Profile</h1>
+    <p><strong>Name:</strong> {{ authService.currentUserValue?.fullName }}</p>
+    <p><strong>Email:</strong> {{ authService.currentUserValue?.email }}</p>
+    <p><strong>Roles:</strong> {{ authService.currentUserValue?.roles?.join(', ') }}</p>
+  </div>
+
+  <div class="card orders-card">
+    <h2>Order History</h2>
+    <div class="order" *ngFor="let order of orders">
+      <div class="order__header">
+        <strong>Order #{{ order.id }}</strong>
+        <span>{{ order.status }}</span>
+      </div>
+      <p>{{ order.createdAt | date:'medium' }}</p>
+      <p>Total: {{ order.totalAmount | currency }}</p>
+      <p>Shipping: {{ order.shippingAddress }}</p>
+    </div>
+  </div>
+</section>

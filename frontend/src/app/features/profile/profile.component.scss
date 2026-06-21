@@ -1,0 +1,24 @@
+.page {
+  padding: 2rem 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.profile-card,
+.orders-card {
+  padding: 1.5rem;
+}
+
+.order {
+  padding: 1rem 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.order:last-child {
+  border-bottom: none;
+}
+
+.order__header {
+  display: flex;
+  justify-content: space-between;
+}
