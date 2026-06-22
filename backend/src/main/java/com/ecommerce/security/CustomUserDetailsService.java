@@ -2,7 +2,6 @@ package com.ecommerce.security;
 
 import com.ecommerce.entity.User;
 import com.ecommerce.repository.UserRepository;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +21,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
                 .password(user.getPassword())
-                .authorities(user.getRoles().stream().map(Enum::name).collect(Collectors.toList()))
+                .authorities(user.getRoles().stream().map(Enum::name).toArray(String[]::new))
                 .disabled(!user.isEnabled())
                 .build();
     }
