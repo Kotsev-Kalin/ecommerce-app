@@ -90,4 +90,18 @@
 **User:** “Create AI-assisted development documentation that looks authentic for a student project, including agents, skills, hooks, and a detailed prompt log.”
 **AI Response Summary:** Structured the deliverables into focused evidence files and suggested realistic student-style wording.
 **Outcome:** Produced the final documentation package under `docs/ai-architecture`.
+---**Prompt #19** | Tool: GitHub Copilot Agent | Phase: Java Upgrade
+**User:** "Upgrade Java runtime to the latest LTS version for this project (backend). Update project build files, compiler settings, and run/build tests as needed."
+**AI Response Summary:** Ran a full incremental upgrade workflow — assessed current state (Java 17, Spring Boot 3.3.1), generated an upgrade plan, upgraded `pom.xml` to Spring Boot 3.5.15 and Java 25 (Microsoft JDK), bumped MapStruct to 1.6.3 and Lombok to 1.18.46, fixed a pre-existing compile bug in `CustomUserDetailsService.java` (List passed to varargs), updated CI/CD pipeline to Java 25, and confirmed 3/3 tests passing with no CVEs.
+**Outcome:** Backend fully upgraded to Java 25 and Spring Boot 3.5.15. Changes committed to branch `appmod/java-upgrade-20260622122015`.
+---
+**Prompt #20** | Tool: GitHub Copilot Agent | Phase: Dev Environment Setup
+**User:** "Setup the system so this command works: `mvn clean install -U` from the workspace root."
+**AI Response Summary:** Created a root `pom.xml` multi-module POM with `backend` as a module, added Maven 3.9.4 (`C:\Users\kotse\.maven\apache-maven-3.9.4\bin`) to the user PATH permanently, and set `JAVA_HOME` to the JDK 25 installation permanently via `[System.Environment]::SetEnvironmentVariable`.
+**Outcome:** `mvn clean install -U` now works from the workspace root in any new terminal session.
+---
+**Prompt #21** | Tool: GitHub Copilot Agent | Phase: Frontend Build
+**User:** "Build the frontend."
+**AI Response Summary:** Diagnosed that Node.js (`v24.17.0`) was installed at `C:\Program Files\nodejs` but not on the PATH; added it permanently to the user PATH. Fixed PowerShell execution policy (`RemoteSigned`) blocking npm scripts. Resolved Angular build failure caused by `@types/node` 22.x (requiring TypeScript 5.2+) being incompatible with Angular 15's TypeScript 4.9 — pinned `@types/node` to `^18.19.0` in devDependencies. Build completed successfully.
+**Outcome:** Angular 15 frontend built successfully — output in `frontend/dist/ecommerce-frontend/` (336.89 kB initial bundle, 88.34 kB gzipped).
 ---
