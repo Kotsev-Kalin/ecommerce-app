@@ -20,6 +20,7 @@ import { AdminDashboardComponent } from './features/admin/dashboard/admin-dashbo
 import { AdminProductsComponent } from './features/admin/products/admin-products.component';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { ProductCardComponent } from './shared/components/product-card/product-card.component';
+import { AiChatComponent } from './shared/components/ai-chat/ai-chat.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { ProductCardComponent } from './shared/components/product-card/product-c
     RegisterComponent,
     ProfileComponent,
     AdminDashboardComponent,
-    AdminProductsComponent
+    AdminProductsComponent,
+    AiChatComponent
   ],
   imports: [
     BrowserModule,
