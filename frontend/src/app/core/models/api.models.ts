@@ -57,3 +57,7 @@ export interface RegisterRequest {
 export interface CheckoutRequest {
   shippingAddress: string;
 }
+
+export interface AiAssistantResponse { answer: string; recommendations: AiProductReference[]; sources: AiProductReference[]; provider: string; }
+export interface AiProductReference { productId: number; name: string; categoryName?: string; price: number; imageUrl?: string; stockQuantity: number; source: string; }
+export interface AiEnrichmentResponse { suggestedTitle: string; suggestedDescription: string; suggestedCategory: string; suggestedTags: string[]; suggestedAltText: string; notice: string; provider: string; }
