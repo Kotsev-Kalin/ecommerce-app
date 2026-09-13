@@ -58,6 +58,25 @@ ecommerce-app/
 3. Start the backend.
 4. Start the frontend.
 
+## Run locally with Docker Compose
+
+Docker Compose starts PostgreSQL, the Spring Boot API, and the production Angular/Nginx client:
+
+```bash
+docker compose up --build
+```
+
+Open `http://localhost:4200`; the API is available on `http://localhost:8080/api`.
+Compose stores database data and uploaded images in named volumes. Stop the stack with
+`docker compose down`; use `docker compose down -v` only when you intentionally want to remove
+local database and upload data.
+
+The defaults are suitable for local development. Override host ports or credentials in a local
+`.env` file, for example `FRONTEND_PORT=4300`, `BACKEND_PORT=8081`, or a non-default
+`POSTGRES_PASSWORD`. `AI_PROVIDER=demo` is the default and needs no API key. The optional
+OpenAI-compatible provider can be enabled with server-side `AI_PROVIDER=openai-compatible` and
+`AI_API_KEY`; never expose that key in the frontend.
+
 ## Environment Variables (`.env.example`)
 
 | Variable | Description | Example |

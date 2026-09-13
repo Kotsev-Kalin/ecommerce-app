@@ -13,6 +13,12 @@
         <input formControlName="active" type="checkbox">
         Active
       </label>
+      <section class="card" style="padding: 1rem;">
+        <h2>AI product suggestions</h2><p>Suggestion-only: review before applying and saving.</p>
+        <button type="button" (click)="generateSuggestions()" [disabled]="enrichmentLoading">{{ enrichmentLoading ? 'Generating...' : 'Generate suggestions' }}</button>
+        <p *ngIf="enrichmentError" role="alert">{{ enrichmentError }}</p>
+        <div *ngIf="enrichment"><p><strong>Title:</strong> {{ enrichment.suggestedTitle }}</p><p><strong>Category:</strong> {{ enrichment.suggestedCategory }}</p><p><strong>Description:</strong> {{ enrichment.suggestedDescription }}</p><p><strong>Tags:</strong> {{ enrichment.suggestedTags.join(', ') }}</p><p><strong>Alt text:</strong> {{ enrichment.suggestedAltText }}</p><button type="button" (click)="applySuggestions()">Apply suggestions to form</button></div>
+      </section>
       <div style="display: flex; gap: 0.75rem;">
         <button type="submit" style="padding: 0.85rem 1rem; border: none; border-radius: 10px; background: #2563eb; color: white;">
           {{ editingId ? 'Update product' : 'Create product' }}
