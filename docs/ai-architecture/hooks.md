@@ -2,6 +2,12 @@
 
 This project documents both traditional development hooks and AI workflow hooks.
 
+## LangGraph Human Approval Hook
+
+`agent-service/app/graph.py` implements the runtime approval hook with LangGraph `interrupt()`. The router sends potentially consequential requests, such as checkout, cancellation, refund, or delivery-address changes, to `approval_gate`. The graph checkpoints its state and returns `awaiting_approval` instead of executing a mutation.
+
+The UI or test client resumes the exact workflow session through `POST /workflow/{sessionId}/resume` with one of three validated decisions: `approved`, `rejected`, or `revise`. The demonstrator records the outcome and does not mutate business data. A production action would require both this approval and a separate secured Spring Boot endpoint that rechecks JWT ownership and business rules.
+
 ## Pre-commit Hooks
 
 Pre-commit hooks are useful guardrails before code reaches the repository.

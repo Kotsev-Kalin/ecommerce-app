@@ -14,6 +14,7 @@ import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.ProductService;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,5 +100,23 @@ class ProductServiceTest {
         when(productRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> productService.getProductById(99L));
+    }
+
+    @Test
+    void shouldExcludeInactiveProductsFromPublicCatalog() {
+        Product inactiveProduct = Product.builder().id(1L).name("Retired Laptop").active(false).build();
+        when(productRepository.findAll()).thenReturn(List.of(inactiveProduct));
+
+        List<ProductDto> products = productService.getAllProducts(null);
+
+        assertEquals(List.of(), products);
+    }
+
+    @Test
+    void shouldHideInactiveProductDetails() {
+        Product inactiveProduct = Product.builder().id(1L).name("Retired Laptop").active(false).build();
+        when(productRepository.findById(1L)).thenReturn(Optional.of(inactiveProduct));
+
+        assertThrows(ResourceNotFoundException.class, () -> productService.getProductById(1L));
     }
 }

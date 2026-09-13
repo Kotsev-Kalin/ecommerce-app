@@ -38,6 +38,16 @@ services:
       postgres:
         condition: service_healthy
 
+  agent-service:
+    build:
+      context: ./agent-service
+    environment:
+      BACKEND_URL: http://backend:8080/api
+    ports:
+      - "${AGENT_SERVICE_PORT:-8000}:8000"
+    depends_on:
+      - backend
+
   frontend:
     build:
       context: ./frontend
