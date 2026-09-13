@@ -1,6 +1,22 @@
-# AI Agents Used in Development
+# AI Agents and Runtime Roles
 
-## Primary Agent: GitHub Copilot (Inline + Chat)
+## Runtime Agent Workflow
+
+The e-commerce application includes a Python LangChain/LangGraph agent service in `agent-service/`. It is a bounded supervisor/router workflow, not an unrestricted autonomous system.
+
+| Runtime role | File | Responsibility | Tools or authority |
+| --- | --- | --- | --- |
+| Router | `app/graph.py:route_request` | Classifies catalog, order, action, or unsupported requests. | Routing only; no data or mutation authority. |
+| Catalog Agent | `app/graph.py:catalog_agent` | Finds active catalog products and presents retrieved fields. | `search_products`, read-only. |
+| Order Support Agent | `app/graph.py:order_support_agent` | Summarizes the authenticated user's orders. | `get_my_orders`, read-only and JWT-backed. |
+| Approval Gate | `app/graph.py:approval_gate` | Pauses action-like requests until a human approves, rejects, or requests revision. | LangGraph `interrupt`; no mutation authority. |
+| Finalizer | `app/graph.py:finalize` | Produces a bounded final response from state. | No tools. |
+
+`WorkflowState` is checkpointed by `MemorySaver` using a session-specific LangGraph `thread_id`. The graph preserves state across an interrupt and a resume request.
+
+## Development Assistance
+
+### GitHub Copilot (Inline + Chat)
 
 GitHub Copilot was the main implementation assistant used during daily coding. It helped generate code inside the editor, suggested repetitive patterns, and accelerated CRUD-heavy files across both the Spring Boot backend and the Angular frontend.
 
@@ -19,7 +35,7 @@ GitHub Copilot was the main implementation assistant used during daily coding. I
 - Login/register/cart/checkout templates
 - Admin product management pages
 
-## Secondary Agent: Claude Code (Claude Sonnet)
+### Architecture and Review Assistance
 
 Claude Code was used as the architecture and review assistant. It was most valuable when thinking across multiple layers at the same time: package structure, security flow, endpoint consistency, missing support classes, and documentation for the AI-assisted assignment.
 
@@ -38,7 +54,7 @@ Claude Code was used as the architecture and review assistant. It was most valua
 - Checkout/order processing sequence
 - Documentation set under `docs/ai-architecture`
 
-## Agent Collaboration Pattern
+### Development Collaboration Pattern
 
 The workflow was intentionally split:
 
@@ -48,4 +64,4 @@ The workflow was intentionally split:
 4. **GitHub Copilot polished local edits** — imports, validation, small refactors, and test skeletons.
 5. **Claude Code helped package the evidence** — prompts, hooks, skills, and development narrative.
 
-In other words, Copilot acted like a fast pair programmer inside files, while Claude Code acted like an architecture reviewer and project-level assistant.
+The development-assistance record is separate from the runtime LangGraph agents above: development tools helped create and review code, while runtime agents serve the application workflow.

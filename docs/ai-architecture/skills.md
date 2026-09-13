@@ -1,4 +1,18 @@
-# AI Skills / Capabilities Leveraged
+# AI Skills and Capabilities
+
+## Runtime LangChain Skills
+
+The LangGraph service exposes typed LangChain tools in `agent-service/app/tools.py`. These are deliberately narrow skills that retrieve authoritative data through the Spring Boot API.
+
+| Skill | Input | Output | Guardrail |
+| --- | --- | --- | --- |
+| `search_products` | Search query and limit | Active product records | Read-only, limit capped at five, uses the catalog API. |
+| `get_product` | Product ID | One product record | Read-only, uses the catalog API. |
+| `get_my_orders` | JWT token | Current user's order records | Read-only, token passed to Spring Boot, which enforces ownership. |
+
+The graph assigns only the necessary tools to each role. No runtime skill can write directly to PostgreSQL, modify an order, or bypass Spring Security.
+
+## Development Assistance Skills
 
 ## Code Completion & Scaffolding
 - **Description:** Fast generation of repetitive implementation patterns.

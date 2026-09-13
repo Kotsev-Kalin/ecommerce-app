@@ -28,3 +28,16 @@
 |24|OpenAI missing key|Clear startup failure|
 
 All cases must pass; inactive/out-of-stock leakage and source/price mismatches have a zero-tolerance threshold.
+
+## LangGraph Workflow Cases
+
+| # | Scenario | Expected evidence |
+|---|---|---|
+|25|Catalog request|Router selects `catalog`; Catalog Agent invokes `search_products`; response contains returned product fields only.| 
+|26|Order-status request without token|Router selects `order`; final response asks the user to sign in; no order data is returned.| 
+|27|Order-status request with token|Order Support Agent invokes `get_my_orders`; returned records belong to the token subject as enforced by Spring Boot.| 
+|28|Order-changing request|Graph returns an interrupt and status `awaiting_approval`; no backend mutation is called.| 
+|29|Rejected approval|Resume with `rejected`; final response confirms that no action was taken.| 
+|30|Revision feedback|Resume with `revise` and feedback; final response records feedback and confirms no action was taken.| 
+
+For each workflow test, record the session ID, route, tools invoked, source IDs, interrupt payload where applicable, and final response. Never record bearer tokens.

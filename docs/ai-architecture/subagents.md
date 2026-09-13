@@ -1,5 +1,21 @@
 # Specialized Subagents / Roles
 
+## Runtime LangGraph Specialists
+
+The application-facing specialists are implemented as LangGraph nodes, not development assistants. They communicate through `WorkflowState` and are coordinated by a deterministic router.
+
+| Specialist | Handoff condition | Result |
+| --- | --- | --- |
+| Router | Every customer request | Selects catalog, order, action, or unsupported path. |
+| Catalog Agent | Product discovery or recommendation request | Calls read-only catalog tools and returns retrieved product facts. |
+| Order Support Agent | Order, delivery, or tracking request | Calls only the authenticated order tool. |
+| Approval Gate | Request may change an order, payment, shipping, or checkout state | Interrupts for human input and preserves state for resume. |
+| Finalizer | All terminal paths | Produces the final bounded response. |
+
+This supervisor/router pattern demonstrates multi-agent coordination while avoiding unconstrained agent loops and direct access to sensitive systems.
+
+## Development Assistance Roles
+
 ## Code Generation Subagent
 
 - **Tool:** GitHub Copilot inline completions

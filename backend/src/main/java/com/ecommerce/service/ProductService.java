@@ -24,12 +24,19 @@ public class ProductService {
                 ? productRepository.findAll()
                 : productRepository.findByNameContainingIgnoreCase(search);
 
-        return products.stream().map(this::toDto).toList();
+        return products.stream()
+            .filter(Product::isActive)
+            .map(this::toDto)
+            .toList();
     }
 
     @Transactional(readOnly = true)
     public ProductDto getProductById(Long id) {
-        return toDto(findProduct(id));
+        Product product = findProduct(id);
+        if (!product.isActive()) {
+            throw new ResourceNotFoundException("Product not found");
+        }
+        return toDto(product);
     }
 
     @Transactional

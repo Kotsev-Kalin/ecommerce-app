@@ -1,6 +1,6 @@
 # Full Stack E-Commerce Application
 
-A full stack e-commerce application built with Angular, Spring Boot, and PostgreSQL. The project demonstrates customer and admin workflows, JWT-based authentication, product CRUD, cart persistence, checkout, order history, and AI-assisted development documentation for an academic assignment.
+A full stack e-commerce application built with Angular, Spring Boot, PostgreSQL, LangChain, and LangGraph. It demonstrates customer and admin workflows, JWT-based authentication, product CRUD, cart persistence, checkout, order history, and a stateful, tool-using AI workflow for an academic assignment.
 
 ## Tech Stack
 
@@ -10,6 +10,8 @@ A full stack e-commerce application built with Angular, Spring Boot, and Postgre
 ![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)
 ![Maven](https://img.shields.io/badge/Build-Maven-C71A36?logo=apachemaven&logoColor=white)
 ![Angular CLI](https://img.shields.io/badge/Tooling-Angular%20CLI-DD0031?logo=angular&logoColor=white)
+![LangChain](https://img.shields.io/badge/AI-LangChain-1C3C3C)
+![LangGraph](https://img.shields.io/badge/AI-LangGraph-1C3C3C)
 
 ## Project Description
 
@@ -22,7 +24,9 @@ The application provides:
 - Persistent cart for authenticated users
 - Checkout and order creation
 - Admin order dashboard
-- AI-assisted development evidence under `docs/ai-architecture`
+- Grounded AI shopping assistant and product enrichment endpoints
+- LangGraph workflow service with typed LangChain tools, memory, routing, and human approval interrupts
+- AI architecture and assessment evidence under `docs/ai-architecture`
 
 ## Repository Structure
 
@@ -34,6 +38,10 @@ ecommerce-app/
 ├── frontend/
 │   ├── package.json
 │   └── src/
+├── agent-service/
+│   ├── app/
+│   ├── requirements.txt
+│   └── Dockerfile
 ├── docs/
 │   └── ai-architecture/
 ├── .github/
@@ -48,6 +56,7 @@ ecommerce-app/
 - Maven 3.9+
 - Node.js 18+
 - npm 9+
+- Python 3.12+ for the standalone LangGraph service when not using Docker
 - PostgreSQL 14+
 - Angular CLI 15+
 
@@ -66,7 +75,7 @@ Docker Compose starts PostgreSQL, the Spring Boot API, and the production Angula
 docker compose up --build
 ```
 
-Open `http://localhost:4200`; the API is available on `http://localhost:8080/api`.
+Open `http://localhost:4200`; the API is available on `http://localhost:8080/api` and the LangGraph service on `http://localhost:8000`.
 Compose stores database data and uploaded images in named volumes. Stop the stack with
 `docker compose down`; use `docker compose down -v` only when you intentionally want to remove
 local database and upload data.
@@ -89,6 +98,7 @@ OpenAI-compatible provider can be enabled with server-side `AI_PROVIDER=openai-c
 | `SERVER_PORT` | Backend port | `8080` |
 | `FILE_UPLOAD_DIR` | Local upload directory | `./uploads` |
 | `ANGULAR_API_URL` | Frontend API base URL | `http://localhost:8080/api` |
+| `AGENT_SERVICE_PORT` | LangGraph service host port | `8000` |
 
 ## Run Backend
 
@@ -115,6 +125,26 @@ npm start
 Frontend URL:
 
 - `http://localhost:4200`
+
+## Run the LangGraph Agent Service
+
+The agent service is a separate Python boundary. Spring Boot remains the system of record for authentication, catalog data, orders, and authorization; the agent service only orchestrates read-only tools and approval state.
+
+```bash
+cd agent-service
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+Endpoints:
+
+- `GET http://localhost:8000/health`
+- `POST http://localhost:8000/workflow`
+- `POST http://localhost:8000/workflow/{sessionId}/resume`
+
+See `docs/ai-architecture/project-architecture.md` and `docs/ai-architecture/assignment-coverage.md` for the runtime design and assessment evidence.
 
 ## API Endpoints Overview
 
@@ -151,10 +181,16 @@ _Add screenshots before final submission._
 
 ## AI-Assisted Development Documentation
 
+- `docs/ai-architecture/project-architecture.md`
+- `docs/ai-architecture/assignment-coverage.md`
 - `docs/ai-architecture/agents.md`
 - `docs/ai-architecture/subagents.md`
 - `docs/ai-architecture/skills.md`
 - `docs/ai-architecture/hooks.md`
+- `docs/ai-architecture/prompt-catalog.md`
+- `docs/ai-architecture/rag-architecture.md`
+- `docs/ai-architecture/ai-safety.md`
+- `docs/ai-architecture/ai-evaluation.md`
 - `docs/ai-architecture/prompt-log.md`
 
 ## License
