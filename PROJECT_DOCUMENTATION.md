@@ -39,6 +39,9 @@ ecommerce-app/
 |       |-- prompts.py          Role and policy prompt definitions
 |       |-- state.py            Shared typed workflow state
 |       `-- tools.py            Read-only Spring API tool definitions
+|   |-- tests/test_graph.py     Five offline workflow tests with mocked tools/model
+|   |-- ecommerce_multi_agent_workflow.ipynb
+|   `-- requirements-dev.txt    Test dependencies
 |-- docs/ai-architecture/       Focused AI assignment and evidence documents
 |-- docker-compose.yml          Local multi-service deployment
 |-- pom.xml                     Root Maven multi-module build
@@ -62,7 +65,7 @@ ecommerce-app/
 | Python agent API | FastAPI and Pydantic | FastAPI 0.115.12 | LangGraph service HTTP boundary and validated request schemas. |
 | Agent HTTP client | HTTPX | 0.28.1 | Calls allow-listed Spring Boot APIs from typed tools. |
 | Agent tools | LangChain Core | 0.3.80 | Defines typed `@tool` functions. |
-| Agent orchestration | LangGraph | 0.4.7 | Stateful graph routing, checkpoints, interrupts, and resume workflow. |
+| Agent orchestration | LangGraph | 0.4.7 with pinned checkpoint, prebuilt, and SDK packages | Stateful graph routing, tool loops, checkpoints, interrupts, and resume workflow. |
 | Python application server | Uvicorn | 0.34.2 | Hosts the FastAPI service. |
 | Containers | Docker and Docker Compose | Repository Dockerfiles and Compose file | Runs PostgreSQL, backend, frontend, and agent service together. |
 | Frontend serving | Nginx | Frontend container | Serves the production Angular build. |
@@ -207,6 +210,7 @@ The Python service provides a separate workflow API:
 - `POST /workflow/{sessionId}/resume`
 
 The create-workflow request validates a required `request` field with a maximum length of 500 characters. Resume requests only accept `approved`, `rejected`, or `revise`, and optional feedback is capped at 500 characters.
+The create endpoint accepts an optional `Authorization: Bearer <JWT>` header; the token is passed only to the authenticated order tool. Responses include `sessionId`, `status`, `answer`, `intent`, retrieved records, and an approval proposal when applicable. The resume endpoint uses the session ID as the LangGraph thread ID and returns HTTP 409 when no resumable approval exists.
 
 ### Workflow graph
 
@@ -266,9 +270,9 @@ The current demonstrator deliberately performs no order, payment, shipping, refu
 
 `agent-service/app/prompts.py` defines role prompts for the workflow. They document intended constraints and provide the approval policy text returned in an interrupt payload.
 
-| Prompt role | Core instruction |
+| Prompt or policy role | Core instruction |
 | --- | --- |
-| Router | Classify as catalog, order, action, or unsupported; never authorize an action. |
+| Router policy | The deterministic router classifies as catalog, order, action, or unsupported; it never authorizes an action. `ROUTER_SYSTEM_PROMPT` documents this policy but is not sent to the model. |
 | Catalog Agent | Use only returned catalog records; cite exact IDs, names, prices, and stock; do not invent product facts. |
 | Order Support Agent | Use only authenticated order-tool records; do not expose another customer's data or mutate an order. |
 | Approval Gate | Pause any request that may change an order, payment, shipping address, or checkout state for explicit human approval. |
@@ -461,13 +465,23 @@ uvicorn app.main:app --reload --port 8000
 
 The documentation describes pre-commit and post-generation hooks as recommended validation points. The intended discipline is generate, review, validate, and refine; AI output is not accepted as automatically correct.
 
+For the assignment workflow, install the pinned development dependencies and run the five offline tests:
+
+```powershell
+Set-Location agent-service
+pip install -r requirements-dev.txt
+pytest tests/test_graph.py -q
+```
+
+The Colab-ready submission notebook, `agent-service/ecommerce_multi_agent_workflow.ipynb`, contains the same graph pattern with three tools, two specialist agents, checkpointed memory, and five demonstration scenarios. It reads the model key through the environment or `getpass`; no key is stored in the notebook.
+
 ## 17. Current Limits and Future Work
 
 The project is intentionally a bounded demonstrator, with several clearly defined extension paths:
 
 - Replace keyword retrieval with an embedding and pgvector implementation behind `ProductSearchService` when semantic search is required.
 - Add model-driven LangGraph routing or specialist reasoning only if grounded tool-result handling, authorization boundaries, and observability remain intact.
-- Map the role prompt strings into actual LLM calls only after defining model configuration, token handling, output validation, and failure behavior.
+- Extend the existing `ChatOpenAI.bind_tools(...)` specialist calls with stronger output validation, retry behavior, and provider-failure handling where production reliability requires it. The catalog and order specialist prompts are already connected to runtime LLM calls; routing remains deterministic by design.
 - Add a separately secured Spring command endpoint for any approved action. The endpoint must revalidate JWT identity, role/ownership, state, stock/payment policy, and idempotency; approval alone must not authorize a mutation.
 - Scope LangGraph `session_id`/`thread_id` to the authenticated principal in production and use durable, appropriately secured checkpoint storage instead of in-memory `MemorySaver`.
 - Add frontend unit/component tests and end-to-end workflow tests.
@@ -491,4 +505,4 @@ This document consolidates the repository's existing focused documents. The sour
 
 ## 19. Conclusion
 
-This project combines a conventional full-stack e-commerce architecture with a carefully bounded AI design. Angular, Spring Boot, PostgreSQL, JWT security, and REST APIs implement the durable commerce experience. The Spring assistant is grounded in retrieved catalog data and can run without an external model. The LangGraph service demonstrates stateful tool orchestration, explicit routing, checkpointed memory, and human approval without granting autonomous write access. The project documentation also records how GitHub Copilot and Claude Code were used as development assistants through concrete, scoped prompts, review steps, and validation practices.
+This project combines a conventional full-stack e-commerce architecture with a carefully bounded AI design. Angular, Spring Boot, PostgreSQL, JWT security, and REST APIs implement the durable commerce experience. The Spring assistant is grounded in retrieved catalog data and can run without an external model. The LangGraph service demonstrates two LLM tool-using specialists, three read-only HTTP tools, explicit deterministic routing, checkpointed memory, and human approval without granting autonomous write access. The Colab-ready notebook and five offline tests cover the assignment workflow, while the project documentation records how GitHub Copilot and Claude Code were used as development assistants through concrete, scoped prompts, review steps, and validation practices.
