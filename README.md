@@ -99,6 +99,8 @@ OpenAI-compatible provider can be enabled with server-side `AI_PROVIDER=openai-c
 | `FILE_UPLOAD_DIR` | Local upload directory | `./uploads` |
 | `ANGULAR_API_URL` | Frontend API base URL | `http://localhost:8080/api` |
 | `AGENT_SERVICE_PORT` | LangGraph service host port | `8000` |
+| `OPENAI_API_KEY` | Server-side key for the LangGraph specialist agents | Set locally; never commit it |
+| `AGENT_MODEL` | OpenAI-compatible chat model used by the specialist agents | `gpt-4o-mini` |
 
 ## Run Backend
 
@@ -128,13 +130,14 @@ Frontend URL:
 
 ## Run the LangGraph Agent Service
 
-The agent service is a separate Python boundary. Spring Boot remains the system of record for authentication, catalog data, orders, and authorization; the agent service only orchestrates read-only tools and approval state.
+The agent service is a separate Python boundary. Its Catalog and Order Support agents use role-specific prompts and `bind_tools(...)` with read-only Spring API tools. Spring Boot remains the system of record for authentication, catalog data, orders, and authorization.
 
 ```bash
 cd agent-service
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
+set OPENAI_API_KEY=your-server-side-key
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -145,6 +148,18 @@ Endpoints:
 - `POST http://localhost:8000/workflow/{sessionId}/resume`
 
 See `docs/ai-architecture/project-architecture.md` and `docs/ai-architecture/assignment-coverage.md` for the runtime design and assessment evidence.
+
+## Agent Workflow Tests and Course Notebook
+
+Run the offline workflow tests, which mock the HTTP tools and model protocol:
+
+```bash
+cd agent-service
+pip install -r requirements-dev.txt
+pytest tests/test_graph.py -q
+```
+
+The submission notebook is [agent-service/ecommerce_multi_agent_workflow.ipynb](agent-service/ecommerce_multi_agent_workflow.ipynb). It is self-contained for Google Colab, declares its dependencies in the first code cell, and includes five tool/HITL demonstration cases.
 
 ## API Endpoints Overview
 

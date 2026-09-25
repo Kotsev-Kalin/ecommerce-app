@@ -2,4 +2,8 @@ fastapi==0.115.12
 uvicorn[standard]==0.34.2
 httpx==0.28.1
 langchain-core==0.3.80
+langchain-openai==0.3.16
 langgraph==0.4.7
+langgraph-checkpoint==2.0.26
+langgraph-prebuilt==0.2.3
+langgraph-sdk==0.1.70

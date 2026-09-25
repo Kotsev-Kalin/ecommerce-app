@@ -1,18 +1,23 @@
+import os
 from uuid import uuid4
 
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import ToolNode
 from langgraph.types import Command, interrupt
 
 from .prompts import APPROVAL_SYSTEM_PROMPT, CATALOG_SYSTEM_PROMPT, ORDER_SYSTEM_PROMPT
 from .state import WorkflowState
-from .tools import get_my_orders, search_products
+from .tools import get_my_orders, get_product, search_products
 
 
 def route_request(state: WorkflowState) -> dict:
     request = state["user_request"].lower()
-    if any(word in request for word in ("cancel", "refund", "change address", "checkout", "place order")):
+    if any(word in request for word in ("cancel", "refund", "change address", "checkout", "place order")) or (
+        "change" in request and "address" in request
+    ):
         intent = "action"
     elif any(word in request for word in ("order", "delivery", "shipping", "track")):
         intent = "order"
@@ -23,36 +28,29 @@ def route_request(state: WorkflowState) -> dict:
     return {"intent": intent}
 
 
+def _model_with_tools(tools: list):
+    """Create the provider-backed model only when a specialist is invoked."""
+    return ChatOpenAI(
+        model=os.getenv("AGENT_MODEL", "gpt-4o-mini"),
+        temperature=0,
+    ).bind_tools(tools)
+
+
 def catalog_agent(state: WorkflowState) -> dict:
-    products = search_products.invoke({"query": state["user_request"], "limit": 3})
-    if not products:
-        answer = "I could not find an active, in-stock catalog product matching that request."
-    else:
-        lines = [
-            f"[{product['id']}] {product['name']} - {product['price']} (stock: {product['stockQuantity']})"
-            for product in products
-        ]
-        answer = "Catalog matches:\n" + "\n".join(lines)
-    return {
-        "products": products,
-        "draft_answer": answer,
-        "messages": [AIMessage(content=answer, name="catalog_agent")],
-    }
+    response = _model_with_tools([search_products, get_product]).invoke(
+        [SystemMessage(content=CATALOG_SYSTEM_PROMPT), *state["messages"]]
+    )
+    return {"messages": [response]}
 
 
 def order_support_agent(state: WorkflowState) -> dict:
-    token = state.get("user_token")
-    if not token:
+    if not state.get("user_token"):
         answer = "Sign in before requesting your order information."
-        orders = []
-    else:
-        orders = get_my_orders.invoke({"user_token": token})
-        answer = f"I found {len(orders)} order(s) for your account."
-    return {
-        "orders": orders,
-        "draft_answer": answer,
-        "messages": [AIMessage(content=answer, name="order_support_agent")],
-    }
+        return {"draft_answer": answer, "messages": [AIMessage(content=answer, name="order_support_agent")]}
+    response = _model_with_tools([get_my_orders]).invoke(
+        [SystemMessage(content=ORDER_SYSTEM_PROMPT), *state["messages"]]
+    )
+    return {"messages": [response]}
 
 
 def approval_gate(state: WorkflowState) -> dict:
@@ -78,7 +76,7 @@ def finalize(state: WorkflowState) -> dict:
         else:
             answer = "No action was taken because approval was not granted."
     else:
-        answer = state["draft_answer"]
+        answer = state.get("draft_answer") or state["messages"][-1].content
     return {"final_answer": answer, "messages": [AIMessage(content=answer, name="finalizer")]}
 
 
@@ -86,17 +84,26 @@ def route_after_router(state: WorkflowState) -> str:
     return {"catalog": "catalog_agent", "order": "order_support_agent", "action": "approval_gate"}.get(state["intent"], "finalize")
 
 
+def route_after_agent(state: WorkflowState) -> str:
+    last_message = state["messages"][-1]
+    return "tools" if getattr(last_message, "tool_calls", None) else "finalize"
+
+
 def build_graph():
     builder = StateGraph(WorkflowState)
     builder.add_node("router", route_request)
     builder.add_node("catalog_agent", catalog_agent)
+    builder.add_node("catalog_tools", ToolNode([search_products, get_product]))
     builder.add_node("order_support_agent", order_support_agent)
+    builder.add_node("order_tools", ToolNode([get_my_orders]))
     builder.add_node("approval_gate", approval_gate)
     builder.add_node("finalize", finalize)
     builder.add_edge(START, "router")
     builder.add_conditional_edges("router", route_after_router)
-    builder.add_edge("catalog_agent", "finalize")
-    builder.add_edge("order_support_agent", "finalize")
+    builder.add_conditional_edges("catalog_agent", route_after_agent, {"tools": "catalog_tools", "finalize": "finalize"})
+    builder.add_edge("catalog_tools", "catalog_agent")
+    builder.add_conditional_edges("order_support_agent", route_after_agent, {"tools": "order_tools", "finalize": "finalize"})
+    builder.add_edge("order_tools", "order_support_agent")
     builder.add_edge("approval_gate", "finalize")
     builder.add_edge("finalize", END)
     return builder.compile(checkpointer=MemorySaver())

@@ -1,8 +1,9 @@
 import os
-from typing import Any
+from typing import Annotated, Any
 
 import httpx
 from langchain_core.tools import tool
+from langgraph.prebuilt import InjectedState
 
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8080/api")
 
@@ -33,8 +34,10 @@ def get_product(product_id: int) -> dict[str, Any]:
 
 
 @tool
-def get_my_orders(user_token: str) -> list[dict[str, Any]]:
+def get_my_orders(user_token: Annotated[str | None, InjectedState("user_token")]) -> list[dict[str, Any]]:
     """Retrieve the current authenticated customer's orders. This tool is read-only."""
+    if not user_token:
+        return []
     response = httpx.get(
         f"{BACKEND_URL}/orders",
         headers=_headers(user_token),
